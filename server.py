@@ -22,11 +22,7 @@
 
 
 import flask
-# Given this
-# from flask import Flask, request
-# stolen from lab5
-from flask import Flask, request, redirect, url_for, g, render_template, flash, session, abort, jsonify
-# end of stolen from lab5
+from flask import Flask, request, redirect, Response
 import json
 app = Flask(__name__)
 app.debug = True
@@ -83,37 +79,39 @@ def hello():
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    # here post will likely add a new entity, and maybe update if it already exists
     data = flask_post_json()
-    #raise Exception("this is data: %s" % data)
-    #raise Exception("this is entity: %s" % entity)
     if entity in myWorld.world().keys():
-        # Need to update existing entity
-        myWorld.update(entity, data.keys()[0], data.values()[0])
+        for key in data.keys():
+            myWorld.update(entity, key, data[key])
     else: # this is a new entity
         myWorld.set(entity, data)
-    # put will update an existing entity, if one doesn't exist be mean and fail
-    return redirect('static/index.html')
+    resp = Response(status=200)
+    jsonData = json.dumps(myWorld.get(entity))
+    resp.set_data(jsonData)
+    return resp
 
 @app.route("/world", methods=['POST','GET'])
 def world():
     '''you should probably return the world here'''
-    return jsonify(myWorld.world())
+    resp = Response(status=200)
+    worldData = myWorld.world()
+    jsonData = json.dumps(worldData)
+    resp.set_data(jsonData)
+    return resp
 
 @app.route("/entity/<entity>")
 def get_entity(entity):
     '''This is the GET version of the entity interface, return a representation of the entity'''
-    # method not allowed is 405
-    # only supported method here should be post, return method not allowed otherwise
-    # get the entity from that uri
-
-    #return redirect('static/index.html')
+    resp = Response(status=200)
+    resp.set_data(json.dumps(myWorld.get(entity)))
+    return resp
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
     '''Clear the world out!'''
     myWorld.clear()
-    return redirect('static/index.html')
+    resp = Response(status=200)
+    return resp
 
 if __name__ == "__main__":
     app.run()
