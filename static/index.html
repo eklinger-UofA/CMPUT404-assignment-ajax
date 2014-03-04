@@ -38,10 +38,11 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
         if (xhr.readyState==4) {
             try {
                 if (xhr.status==200) {
+                    //XXX: DONE
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
                     jsondata = xhr.responseText;
-                    //callback()
+                    callback()
                 }
             } 
             catch(e) {
@@ -49,6 +50,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
             }
         }
     };
+    //XXX: Done
     //XXX: POST to a URL
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
@@ -68,12 +70,41 @@ function drawCircle(context,entity) {
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        fillStyle = entity["colour"];
-        strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        //fillStyle = entity["colour"];
+        //strokeStyle = fillStyle;
+        //arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
+        //stroke();                                
+        //drawNyanCat(context, x, y);
+        if (entity["colour"] == 'red') {
+            drawNyanCat(context, x, y);
+        }
+        else {
+            drawGradients(context, x, y);
+        }
     }
 }
+
+function drawGradients(context, x, y) {
+        var grad = context.createLinearGradient(0, y-25, 0, y+25);
+            grad.addColorStop(0, 'red');
+            grad.addColorStop(1 / 6, 'orange');
+            grad.addColorStop(2 / 6, 'yellow');
+            grad.addColorStop(3 / 6, 'green')
+            grad.addColorStop(4 / 6, 'aqua');
+            grad.addColorStop(5 / 6, 'blue');
+            grad.addColorStop(1, 'purple');
+            context.fillStyle = grad;
+            context.fillRect(x-10, y-25, 20, 50);
+}
+
+function drawNyanCat(context, x, y) {
+    var img = new Image();
+    img.onload = function(){
+        context.drawImage(img, x-25, y-25, 50, 50);
+    }
+    img.src = 'nyancatsvg.png';
+}
+
 
 function prepEntity(entity) {
     if (!entity["colour"]) {
@@ -142,6 +173,7 @@ function getPosition(e) {
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
+    //XXX: Done
     //XXX: Send a XHTML Request that updates the entity you just  modified!
     url = entity;
     sendJSONXMLHTTPRequest(url, data, update);
@@ -267,6 +299,7 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 
 function update() {
+    //XXX: Done
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
     var xhr = new XMLHttpRequest();
 
@@ -289,9 +322,7 @@ function update() {
 
 
 // 30 frames per second
-// setInterval(update, 1000/30.0);
-// for testig going to every second
-setInterval(update, 1000);
+setInterval(update, 1000/30.0);
 
 
     </script>
